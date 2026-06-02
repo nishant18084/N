@@ -24,7 +24,7 @@ jobs:
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install google-genai edge-tts requests moviepy==1.0.3
+        pip install google-genai edge-tts requests moviepy==1.0.3 Pillow
 
     - name: Execute Main Core Engine
       env:
