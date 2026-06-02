@@ -15,14 +15,13 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        # Yahan se humne broken caching line hata di hai
 
     - name: Install System Engine Dependencies (FFmpeg)
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg
 
-    - name: Warm up Dependency Buffers
+    - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install google-genai edge-tts requests moviepy==1.0.3
