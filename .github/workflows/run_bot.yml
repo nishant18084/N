@@ -24,8 +24,7 @@ jobs:
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
-        # Yahan humne moviepy aur requests dono dependencies add kar di hain
-        pip install google-genai edge-tts moviepy requests
+        pip install google-genai edge-tts requests moviepy==1.0.3
 
     - name: Run Script
       env:
