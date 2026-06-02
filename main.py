@@ -41,16 +41,12 @@ async def generate_audio_stream(text: str, output_filename: str = "voice.mp3") -
     print(f"[💾] Audio saved as: {output_filename}")
 
 def compile_production_video(audio_input: str, video_output: str) -> bool:
-    print("[🎬] Generating auto-background and rendering video...")
+    print("[🎬] Generating background and rendering video...")
     audio_clip = None
     final_video = None
     try:
         audio_clip = AudioFileClip(audio_input)
-        
-        # Python khud ek premium dark-blue vertical background generate karega (Shorts size: 1080x1920)
         bg_clip = ColorClip(size=(1080, 1920), color=(15, 23, 42), duration=audio_clip.duration)
-        
-        # Audio aur background ko combine karna
         final_video = bg_clip.set_audio(audio_clip)
         
         final_video.write_videofile(
@@ -71,36 +67,66 @@ def compile_production_video(audio_input: str, video_output: str) -> bool:
         if audio_clip: audio_clip.close()
         if final_video: final_video.close()
 
+def send_audio_to_telegram(audio_path: str, caption_text: str):
+    """Telegram par sirf Audio (.mp3) bhejne ke liye"""
+    print("[🚀] Sending Audio to Telegram...")
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendAudio"
+    try:
+        with open(audio_path, 'rb') as audio_file:
+            payload = {
+                'chat_id': TELEGRAM_CHAT_ID,
+                'caption': f"🎵 *Audio Voiceover Only*\n\n{caption_text}",
+                'title': 'voiceover.mp3'
+            }
+            files = {'audio': audio_file}
+            requests.post(url, data=payload, files=files, timeout=45)
+        print("[✅] Audio sent.")
+    except Exception as e:
+        print(f"[❌] Audio send failed: {e}")
+
 def send_video_to_telegram(video_path: str, caption_text: str):
-    print("[🚀] Sending video to Telegram...")
+    """Telegram par Audio ke sath complete Video bhejne ke liye"""
+    print("[🚀] Sending Full Video to Telegram...")
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendVideo"
     try:
         with open(video_path, 'rb') as video_file:
             payload = {
                 'chat_id': TELEGRAM_CHAT_ID,
-                'caption': caption_text,
+                'caption': f"🎬 *Full Video with Audio*\n\n{caption_text}",
                 'supports_streaming': True
             }
             files = {'video': video_file}
             response = requests.post(url, data=payload, files=files, timeout=60)
             
         if response.status_code == 200:
-            print("[🎉] Video delivered to Telegram!")
+            print("[🎉] Video delivered successfully!")
         else:
-            print(f"[❌] Telegram error: {response.text}")
+            print(f"[❌] Telegram video error: {response.text}")
     except Exception as e:
-        print(f"[❌] Network failure: {e}")
+        print(f"[❌] Video send failed: {e}")
 
 async def main():
     video_topic = "Top 3 Amazing Facts about Artificial Intelligence"
     
-    # 1. AI Script
+    # 1. AI Script generate karein
     script_content = generate_script_with_fallback(video_topic)
-    print(f"Script: {script_content}")
     
-    # 2. Audio Voiceover
+    # 2. Audio Voiceover (.mp3) banayein
     await generate_audio_stream(script_content, "voice.mp3")
     
-    # 3. Create Video & Send
-    if os.path.
+    # 3. Pehle sirf Audio Telegram par bhejein
+    if os.path.exists("voice.mp3"):
+        send_audio_to_telegram("voice.mp3", script_content)
+        
+        # 4. Ab Video render karein (Audio jod kar)
+        render_success = compile_production_video("voice.mp3", "output_short.mp4")
+        
+        # 5. Ab complete Video Telegram par bhejein
+        if render_success and os.path.exists("output_short.mp4"):
+            send_video_to_telegram("output_short.mp4", script_content)
+    else:
+        print("[❌] Assets tracking error.")
+
+if __name__ == "__main__":
+    asyncio.run(main())
     
