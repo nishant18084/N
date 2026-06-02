@@ -4,7 +4,8 @@ import sys
 import requests
 import numpy as np
 from google import genai
-from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip
+from moviepy.editor import VideoClip, AudioFileClip
+from PIL import Image, ImageDraw, ImageFont
 
 # Environment Credentials Setup
 API_KEY = os.getenv("GEMINI_API_KEY")
@@ -21,54 +22,20 @@ async def generate_audio_stream(text: str, output_filename: str = "voice.mp3") -
     await communicate.save(output_filename)
     print(f"[💾] Audio array registered: {output_filename}")
 
-def download_live_background_clip(output_path="real_bg.mp4"):
-    """Internet se ek real chalti hui vertical shorts background video clip auto-download karne ke liye"""
-    print("[📥] Downloading real live video clip from cloud network...")
-    
-    # Ek standard vertical satisfying/nature/relaxing high-quality stock video link
-    video_url = "https://v1.assets.mixkit.co/videos/preview/mixkit-vertical-shot-of-a-beautiful-waterfall-41525-large.mp4"
-    
-    try:
-        response = requests.get(video_url, stream=True, timeout=45)
-        if response.status_code == 200:
-            with open(output_path, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=1024*1024):
-                    if chunk:
-                        f.write(chunk)
-            print("[✅] Live background video downloaded successfully.")
-            return True
-        else:
-            print("[❌] Direct cloud source link failed.")
-            return False
-    except Exception as e:
-        print(f"[❌] Network error while downloading video asset: {e}")
-        return False
-
-def compile_production_video(video_input: str, audio_input: str, video_output: str, script_text: str) -> bool:
-    print("[🎬] Rendering real live video with word-synced tracking overlay...")
-    video_clip = None
+def compile_production_video(audio_input: str, video_output: str, script_text: str) -> bool:
+    print("[🎬] Generating moving cinematic background with text synchronization...")
     audio_clip = None
     final_video = None
     try:
-        video_clip = VideoFileClip(video_input)
         audio_clip = AudioFileClip(audio_input)
         duration = audio_clip.duration
         
-        # Audio ke length ke hisab se background video ko auto-loop ya trim karna
-        if video_clip.duration < duration:
-            from moviepy.video.fx.all import loop
-            video_clip = loop(video_clip, duration=duration)
-        else:
-            video_clip = video_clip.subclip(0, duration)
-            
-        # Target Vertical Size ensure karna (1080x1920 layout shorts check)
-        video_clip = video_clip.resize(newsize=(1080, 1920))
-
+        # Line wise split for subtitle transitions
         raw_lines = [line.strip() for line in script_text.split('\n') if line.strip()]
         total_lines = len(raw_lines)
         time_per_line = duration / total_lines if total_lines > 0 else duration
 
-        from PIL import Image, ImageDraw, ImageFont
+        # System Font setup for Linux Container
         font_paths = [
             "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
             "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
@@ -83,16 +50,29 @@ def compile_production_video(video_input: str, audio_input: str, video_output: s
             font = ImageFont.load_default()
 
         def make_frame(t):
-            # Base real video frame extract karna
-            frame = video_clip.get_frame(t)
-            img = Image.fromarray(frame)
+            # 1. GENERATE MOVING BACKGROUND ANIMATION (No internet required)
+            # Dheere-dheere badalta hua premium deep background color loop
+            r = int(15 + np.sin(t * 0.5) * 5)
+            g = int(23 + np.cos(t * 0.5) * 5)
+            b = int(42 + np.sin(t * 0.3) * 10)
+            img = Image.new('RGB', (1080, 1920), color=(r, g, b))
             draw = ImageDraw.Draw(img)
             
-            # Active tracking text dynamically find karna
+            # Subtitle background subtle glowing circles to show heavy video movement
+            for i in range(3):
+                radius = int(200 + np.sin(t * 2 + i) * 50)
+                center_x = int(540 + np.cos(t + i) * 100)
+                center_y = int(960 + np.sin(t + i) * 150)
+                draw.ellipse(
+                    [(center_x - radius, center_y - radius), (center_x + radius, center_y + radius)], 
+                    outline=(r+15, g+20, b+35), width=4
+                )
+            
+            # 2. SUBTITLE SYNCHRONIZATION LOGIC
             current_index = min(int(t / time_per_line), total_lines - 1) if total_lines > 0 else 0
             active_text = raw_lines[current_index]
             
-            # Word wrapping engine for screen limits
+            # Word wrapping for safe screen bounds
             words = active_text.split()
             wrapped_lines = []
             chunk = []
@@ -105,17 +85,18 @@ def compile_production_video(video_input: str, audio_input: str, video_output: s
             if chunk:
                 wrapped_lines.append(" ".join(chunk))
                 
-            # Text container center overlay screen render
+            # Render Text onto the live frame matrix
             y_offset = 950 - (len(wrapped_lines) * 45)
             for wl in wrapped_lines:
-                # High-contrast bold yellow titles look exactly like reference link
-                draw.text((104, y_offset + 3), wl, fill=(0, 0, 0), font=font) # shadow
-                draw.text((100, y_offset), wl, fill=(255, 234, 0), font=font) # main yellow text
+                # Heavy Drop Shadow for premium YouTube Shorts look
+                draw.text((104, y_offset + 4), wl, fill=(0, 0, 0), font=font)
+                # Vibrant Yellow Main Text
+                draw.text((100, y_offset), wl, fill=(255, 234, 0), font=font)
                 y_offset += 95
                 
             return np.array(img)
 
-        # Video clip create karke audio mix karna
+        # Build real full-motion mp4 file container
         animated_clip = VideoClip(make_frame, duration=duration)
         final_video = animated_clip.set_audio(audio_clip)
         
@@ -124,20 +105,20 @@ def compile_production_video(video_input: str, audio_input: str, video_output: s
             fps=24, 
             codec="libx264", 
             audio_codec="aac",
-            bitrate="2200k",
+            bitrate="2000k",
             threads=2,
             logger=None
         )
         return True
     except Exception as e:
-        print(f"[❌] Error during production rendering: {e}")
+        print(f"[❌] Rendering failed at core layer: {e}")
         return False
     finally:
-        if video_clip: video_clip.close()
         if audio_clip: audio_clip.close()
         if final_video: final_video.close()
 
 def send_video_to_telegram(video_path: str, caption_text: str):
+    print("[🚀] Transporting compiled short video package to Telegram...")
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendVideo"
     try:
         with open(video_path, 'rb') as video_file:
@@ -149,13 +130,13 @@ def send_video_to_telegram(video_path: str, caption_text: str):
             }
             files = {'video': video_file}
             response = requests.post(url, data=payload, files=files, timeout=90)
-            print(f"[🎉] Video successfully deployed to channel: {response.status_code}")
+            print(f"[🎉] Telegram Gateway Response Code: {response.status_code}")
     except Exception as e:
-        print(f"[❌] Telegram transport layer failure: {e}")
+        print(f"[❌] Critical network push failure: {e}")
 
 async def main():
     telegram_caption = (
-        "🎬 *AI Rendered Short Video with Real Background*\n\n"
+        "🎬 *AI Rendered Short Video with Moving Background*\n\n"
         "AI ke baare mein Top 3 amazing facts jo aapko shock kar denge!\n\n"
         "Fact 1: Har din, aap AI use karte ho! Google Maps, Netflix suggestions, ya Siri. Yeah, sab AI hai!\n\n"
         "Fact 2: AI ne chess, Go, aur poker mein world champions ko haraya hai. Socho, kitna smart hai!\n\n"
@@ -163,7 +144,7 @@ async def main():
         "Hai na amazing? AI ki duniya mein aur kya jaanna chahte ho? Comments mein batao!"
     )
     
-    # Line by line split tracking logic
+    # Exact subtitle line sequencing for the reference look
     script_lines = (
         "AI ke baare mein Top 3 amazing facts jo aapko shock kar denge!\n"
         "Fact 1: Har din, aap AI use karte ho!\n"
@@ -177,13 +158,11 @@ async def main():
     await generate_audio_stream(telegram_caption, "voice.mp3")
     
     if os.path.exists("voice.mp3"):
-        # Real background automatically cloud se download hoga
-        if download_live_background_clip("real_bg.mp4"):
-            render_success = compile_production_video("real_bg.mp4", "voice.mp3", "output_short.mp4", script_lines)
-            if render_success and os.path.exists("output_short.mp4"):
-                send_video_to_telegram("output_short.mp4", telegram_caption)
+        render_success = compile_production_video("voice.mp3", "output_short.mp4", script_lines)
+        if render_success and os.path.exists("output_short.mp4"):
+            send_video_to_telegram("output_short.mp4", telegram_caption)
     else:
-        print("[❌] Asset verification error.")
+        print("[❌] Voice track buffer initialization failed.")
 
 if __name__ == "__main__":
     asyncio.run(main())
