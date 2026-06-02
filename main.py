@@ -3,8 +3,7 @@ import os
 import edge_tts
 import requests
 from google import genai
-# Naye version ke mutabik direct moviepy se import kar rahe hain
-from moviepy import VideoFileClip, AudioFileClip
+from moviepy.editor import VideoFileClip, AudioFileClip
 
 # API & Bot Setup
 API_KEY = os.getenv("GEMINI_API_KEY")
@@ -35,8 +34,9 @@ def create_video(video_input, audio_input, video_output):
         video_clip = VideoFileClip(video_input)
         audio_clip = AudioFileClip(audio_input)
         
-        final_video = video_clip.with_duration(audio_clip.duration)
-        final_video = final_video.with_audio(audio_clip)
+        # MoviePy 1.0.3 ke methods
+        final_video = video_clip.set_duration(audio_clip.duration)
+        final_video = final_video.set_audio(audio_clip)
         
         final_video.write_videofile(
             video_output, 
@@ -78,9 +78,14 @@ def send_to_telegram(video_path, caption_text):
 async def main():
     video_topic = "Top 3 Amazing Facts about AI"
     
+    # 1. Script Generation
     script_text = generate_script(video_topic)
+    print(f"Script: {script_text}")
+    
+    # 2. Audio Generation
     await generate_audio(script_text)
     
+    # 3. Video Creation & Delivery
     if os.path.exists("background.mp4") and os.path.exists("voice.mp3"):
         success = create_video("background.mp4", "voice.mp3", "output_short.mp4")
         if success:
