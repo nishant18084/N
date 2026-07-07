@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nishant official | Links</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+            background: linear-gradient(135deg, #0f0f11 0%, #1a1a24 100%);
             color: #ffffff;
             margin: 0;
             padding: 0;
@@ -18,44 +19,57 @@
         }
 
         .profile-container {
-            background: #1a1a1a;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            background: rgba(26, 26, 36, 0.85);
+            padding: 35px 25px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
             text-align: center;
-            max-width: 380px;
+            max-width: 360px;
             width: 90%;
-            border: 1px solid #2a2a2a;
+            border: 1px solid #2d2d3f;
+            backdrop-filter: blur(10px);
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 15px auto;
         }
 
         .profile-img {
-            width: 110px;
-            height: 110px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            border: 3px solid #e1306c; /* Instagram pink/red theme */
+            border: 3px solid #ff4500; /* Sanatan Theme Orange Border */
             object-fit: cover;
-            box-shadow: 0 0 15px rgba(225, 48, 108, 0.4);
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.4);
         }
 
         h1 {
             font-size: 22px;
             color: #ffffff;
-            margin: 15px 0 5px 0;
-            font-weight: 600;
+            margin: 5px 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .username {
-            color: #888888;
+            color: #aaaaaa;
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: block;
         }
 
         .bio {
-            color: #cccccc;
-            font-size: 15px;
+            color: #dddddd;
+            font-size: 14px;
             margin-bottom: 30px;
-            line-height: 1.4;
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 12px;
+            border-left: 3px solid #ff4500;
         }
 
         .links-container {
@@ -65,52 +79,72 @@
         }
 
         .link-btn {
-            display: block;
-            background: #262626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #ffffff;
             text-decoration: none;
             padding: 14px;
-            border-radius: 30px;
-            font-weight: bold;
+            border-radius: 14px;
+            font-weight: 600;
             font-size: 16px;
-            border: 1px solid #3a3a3a;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .link-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        .link-btn i {
+            font-size: 20px;
+            position: absolute;
+            left: 20px;
         }
 
-        /* Special Styling for Instagram Button */
+        /* Instagram Button styling */
         .instagram-btn {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            border: none;
+            box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3);
         }
 
         .instagram-btn:hover {
-            background: linear-gradient(45deg, #bc1888 0%, #cc2366 25%, #dc2743 50%, #e6683c 75%, #f09433 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(220, 39, 67, 0.5);
+        }
+
+        /* YouTube Button styling */
+        .youtube-btn {
+            background: #ff0000;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .youtube-btn:hover {
+            background: #cc0000;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
 
     <div class="profile-container">
-        <img src="https://via.placeholder.com/150" alt="Nishant official" class="profile-img">
+        <div class="avatar-container">
+            <img src="https://via.placeholder.com/150" alt="Nishant official" class="profile-img">
+        </div>
         
         <h1>Nishant official</h1>
         <span class="username">@nishant_vlogs_1</span>
         
-        <p class="bio">Welcome to my official page! 🎬 Support me by following my journey below.</p>
+        <p class="bio">जय श्री राम | जय बजरंगबली 🚩<br>Welcome to my page. YouTube par Sanatan Shorts dekhne ke liye niche click karein! 👇</p>
 
         <div class="links-container">
-            <a href="https://instagram.com/nishant_vlogs_1" target="_blank" class="link-btn instagram-btn">Follow Me on Instagram</a>
+            <a href="https://instagram.com/nishant_vlogs_1" target="_blank" class="link-btn instagram-btn">
+                <i class="fab fa-instagram"></i> Follow on Instagram
+            </a>
             
-            <a href="#" class="link-btn">My YouTube Channel</a>
-            <a href="#" class="link-btn">Join My Discord</a>
+            <a href="https://youtube.com/@KamalKishor-n" target="_blank" class="link-btn youtube-btn">
+                <i class="fab fa-youtube"></i> Subscribe on YouTube
+            </a>
         </div>
     </div>
 
 </body>
 </html>
-
